@@ -46,10 +46,13 @@ module ExceptionLogger
         end
         write_attribute(:environment, (env << "* Process: #{$$}" << "* Server : #{self.class.host_name}") * "\n")
 
+        filters = Rails.application.config.filter_parameters
+        f = ActionDispatch::Http::ParameterFilter.new filters
+        params = f.filter request.parameters
         write_attribute(:request, [
             "* URL:#{" #{request.method.to_s.upcase}" unless request.get?} #{request.protocol}#{request.env["HTTP_HOST"]}#{request.fullpath}",
             "* Format: #{request.format.to_s}",
-            "* Parameters: #{request.parameters.inspect}",
+            "* Parameters: #{params.inspect}",
             "* Rails Root: #{rails_root}"
           ] * "\n")
       end
